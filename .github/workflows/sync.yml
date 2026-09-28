@@ -1,0 +1,155 @@
+# SPDX-FileCopyrightText: 2026 Sebastien Rousseau <sebastian.rousseau@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-only
+
+# The version rule, rule 2: a passmcp release propagates here automatically.
+# passmcp's release workflow fires repository_dispatch with the version and
+# the multi-arch image digest; this moves the Dockerfile onto that image,
+# moves every version pin, opens a changelog section, and raises a pull
+# request. Commits are made through the API so GitHub signs them.
+name: Sync with a passmcp release
+
+on:
+  repository_dispatch:
+    types: [passmcp-release]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The passmcp release to sync with, as vX.Y.Z"
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  sync:
+    name: Pin the release's image and open the pull request
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Resolve the version and the image digest
+        id: rel
+        env:
+          DISPATCHED_VERSION: ${{ github.event.client_payload.version }}
+          DISPATCHED_DIGEST: ${{ github.event.client_payload.image_digest }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version="${DISPATCHED_VERSION:-${INPUT_VERSION}}"
+          [[ "${version}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must be vX.Y.Z, got '${version}'"; exit 1; }
+          digest="${DISPATCHED_DIGEST:-}"
+          if [[ -z "${digest}" ]]; then
+            # Fetched to a file and parsed from it: a download piped into an
+            # interpreter reads as download-then-run to Scorecard.
+            curl -fsSL "https://ghcr.io/token?scope=repository:sebastienrousseau/passmcp:pull" -o "${RUNNER_TEMP}/ghcr-token.json"
+            token=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"])' "${RUNNER_TEMP}/ghcr-token.json")
+            digest=$(curl -fsSI -H "Authorization: Bearer ${token}" \
+              -H "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json" \
+              "https://ghcr.io/v2/sebastienrousseau/passmcp/manifests/${version#v}" \
+              | tr -d '\r' | awk 'tolower($1) == "docker-content-digest:" { print $2 }')
+          fi
+          [[ "${digest}" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo "::error::no image digest for ${version}"; exit 1; }
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "digest=${digest}" >> "${GITHUB_OUTPUT}"
+
+      - name: Rewrite the pins and the changelog
+        id: edit
+        env:
+          VERSION: ${{ steps.rel.outputs.version }}
+          DIGEST: ${{ steps.rel.outputs.digest }}
+        run: |
+          set -euo pipefail
+          ver="${VERSION#v}"
+          if grep -Eq "^## \[${ver}\]" CHANGELOG.md; then
+            echo "already at ${VERSION}"; echo "changed=false" >> "${GITHUB_OUTPUT}"; exit 0
+          fi
+          # The image builds on passmcp's image for this release: digest and version move together.
+          sed -i -E "s|^FROM ghcr.io/sebastienrousseau/passmcp@sha256:[0-9a-f]{64}$|FROM ghcr.io/sebastienrousseau/passmcp@${DIGEST}|; s|^ARG PASSMCP_VERSION=[0-9.]+$|ARG PASSMCP_VERSION=${ver}|" Dockerfile
+          sed -i -E "s#(sebastienrousseau/passmcp(-mcp)?/cmd/passmcp(-mcp)?)@v[0-9]+\.[0-9]+\.[0-9]+#\1@${VERSION}#g; s#ghcr\.io/sebastienrousseau/passmcp-server:[0-9]+\.[0-9]+\.[0-9]+#ghcr.io/sebastienrousseau/passmcp-server:${ver}#g" README.md docs/*.md
+          today=$(date -u +%Y-%m-%d)
+          python3 - "$ver" "$today" "$DIGEST" <<'PY'
+          import json, re, sys
+          ver, today, digest = sys.argv[1:]
+          s = json.load(open("server.json"))
+          s["version"] = ver
+          for p in s.get("packages", []):
+              if p.get("registryType") == "oci":
+                  p["identifier"] = re.sub(r":[0-9.]+$", ":" + ver, p["identifier"])
+          open("server.json", "w").write(json.dumps(s, indent=2) + "\n")
+          def release_changelog(c, ver, today, bullet):
+              """Open the section for ver above the unreleased entries, with the
+              lockstep bullet first under ### Changed: merged into an existing
+              Changed list, or a new one placed in Keep a Changelog's order."""
+              head = "## [Unreleased]\n"
+              start = c.index(head) + len(head)
+              nxt = re.search(r"(?m)^## \[", c[start:])
+              end = start + nxt.start() if nxt else len(c)
+              pending = c[start:end].strip("\n")
+              parts = re.split(r"(?m)^### ", pending)
+              lead, blocks = parts[0].strip("\n"), {}
+              for part in parts[1:]:
+                  name, _, body = part.partition("\n")
+                  name, body = name.strip(), body.strip("\n")
+                  blocks[name] = (blocks[name] + "\n" + body) if name in blocks else body
+              blocks["Changed"] = bullet + ("\n" + blocks["Changed"] if blocks.get("Changed") else "")
+              canon = ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
+              names = sorted(blocks, key=lambda n: canon.index(n) if n in canon else len(canon))
+              body = "\n\n".join(f"### {n}\n\n{blocks[n]}" for n in names)
+              section = f"## [{ver}] — {today}\n\n" + (lead + "\n\n" if lead else "") + body + "\n\n"
+              c = c[:start] + "\n" + section + c[end:]
+              return re.sub(r"\[Unreleased\]: (.*)/compare/v[0-9.]+\.\.\.HEAD",
+                            rf"[Unreleased]: \1/compare/v{ver}...HEAD\n[{ver}]: \1/releases/tag/v{ver}", c)
+          c = open("CHANGELOG.md").read()
+          bullet = (f"- **In lockstep with passmcp {ver}.** The image builds on "
+                   f"`ghcr.io/sebastienrousseau/passmcp@{digest}`, the multi-arch image passmcp's release published for {ver}, and every "
+                   "install line and the registry listing name the release. Opened by the sync workflow on the release's dispatch; "
+                   "passmcp's own changelog says what changed in the diagnostic.")
+          c = release_changelog(c, ver, today, bullet)
+          open("CHANGELOG.md", "w").write(c)
+          PY
+          scripts/verify-release-versions.sh "${VERSION}"
+          echo "changed=true" >> "${GITHUB_OUTPUT}"
+          git diff --stat
+
+      - name: Commit through the API and open the pull request
+        if: steps.edit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional. A pull request opened with GITHUB_TOKEN triggers no
+          # workflows, so its checks never start until someone closes and
+          # reopens it. A fine-grained token with pull-requests: write on
+          # this repository, stored as SYNC_TOKEN, opens it as a user and the
+          # checks run. The commits stay GITHUB_TOKEN's: signed by GitHub and
+          # authored by the bot the DCO check exempts.
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
+          VERSION: ${{ steps.rel.outputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          branch="sync/${VERSION}"
+          base=$(git rev-parse HEAD)
+          gh api --method POST "repos/${REPO}/git/refs" -f ref="refs/heads/${branch}" -f sha="${base}" >/dev/null
+          # One API commit per changed file: each is signed by GitHub, which
+          # is what the signed-commit rule asks for and a runner cannot do.
+          for f in $(git diff --name-only); do
+            sha=$(gh api "repos/${REPO}/contents/${f}?ref=${branch}" --jq .sha)
+            gh api --method PUT "repos/${REPO}/contents/${f}" \
+              -f message="chore: pin the passmcp ${VERSION} image in ${f}" \
+              -f content="$(base64 -w0 "${f}")" -f sha="${sha}" -f branch="${branch}" >/dev/null
+          done
+          if [[ -n "${SYNC_TOKEN}" ]]; then
+            pr_token="${SYNC_TOKEN}"
+          else
+            pr_token="${GH_TOKEN}"
+            echo "::notice::SYNC_TOKEN is not set: the pull request is opened with GITHUB_TOKEN, so close and reopen it to start its checks"
+          fi
+          GH_TOKEN="${pr_token}" gh pr create --base main --head "${branch}" \
+            --title "chore: sync with passmcp ${VERSION}" \
+            --body "Opened by the sync workflow on passmcp's release dispatch. Builds on passmcp's ${VERSION} image by digest, moves every install line and the registry listing to ${VERSION}, and opens the changelog section. CI's digest and lockstep checks are the review."

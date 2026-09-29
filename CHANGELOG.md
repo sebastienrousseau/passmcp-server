@@ -13,7 +13,19 @@ release — the container image is built on passmcp's image for the same
 version — so its version is passmcp's latest release, exactly, and a release
 here with nothing in it is the version rule working.
 
-## [Unreleased]
+## [0.0.3]
+
+The family's third release. The three tools, their arguments and their
+results are the 0.0.1 ones.
+
+### Added
+
+- **Fuzz targets for the stdio loop and the allowlist.** `FuzzServe`
+  feeds arbitrary input to the server and checks that stdout carries
+  only JSON-RPC responses and that passmcp is never pointed at an
+  endpoint the default allowlist refuses; `FuzzAllowlist` checks that an
+  accepted endpoint is always a credential-free http or https URL named
+  by loopback or by an allowlist entry.
 
 ### Fixed
 
@@ -87,6 +99,6 @@ The first release.
   attestation about one, from inside the editor. The tools are read-only,
   the targets allowlisted, and no credential is ever sent.
 
-[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.2...HEAD
+[0.0.3]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.2...HEAD
 [0.0.2]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.2
 [0.0.1]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1

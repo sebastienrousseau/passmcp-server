@@ -15,6 +15,13 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The registry listing's publishing guide names the right login.**
+  `com.sebastienrousseau/passmcp-server` is a domain namespace, which the
+  registry grants on DNS proof for `sebastienrousseau.com`; the guide said
+  GitHub login, which grants only `io.github.sebastienrousseau/*`.
+
 ## [0.0.2] — 2026-09-29
 
 The family's second release. The three tools, their arguments and their

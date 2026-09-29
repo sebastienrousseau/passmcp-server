@@ -13,7 +13,7 @@ release — the container image is built on passmcp's image for the same
 version — so its version is passmcp's latest release, exactly, and a release
 here with nothing in it is the version rule working.
 
-## [0.0.1] — Unreleased
+## [0.0.1] — 2026-09-29
 
 The first release.
 

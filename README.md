@@ -13,7 +13,7 @@
 
 <p align="center">
   <a href="https://github.com/sebastienrousseau/passmcp-server/actions"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/passmcp-server/ci.yml?style=for-the-badge&logo=github" alt="Build Status" /></a>
-  <a href="https://github.com/sebastienrousseau/passmcp-server/pkgs/container/passmcp-server"><img src="https://img.shields.io/badge/ghcr.io-passmcp--mcp-fc8d62?style=for-the-badge&logo=docker&logoColor=white" alt="Container image" /></a>
+  <a href="https://github.com/sebastienrousseau/passmcp-server/pkgs/container/passmcp-server"><img src="https://img.shields.io/badge/ghcr.io-passmcp--server-fc8d62?style=for-the-badge&logo=docker&logoColor=white" alt="Container image" /></a>
   <a href="https://pkg.go.dev/satellion.com/passmcp-server"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&logo=go&logoColor=white" alt="Go Reference" /></a>
   <a href="https://scorecard.dev/viewer/?uri=satellion.com/passmcp-server"><img src="https://img.shields.io/ossf-scorecard/satellion.com/passmcp-server?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0--only-blue?style=for-the-badge" alt="License: GPL-3.0-only" /></a>

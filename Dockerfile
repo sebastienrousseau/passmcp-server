@@ -17,7 +17,7 @@
 # tag disagree; move it and the digest together. To resolve the digest:
 #   docker buildx imagetools inspect ghcr.io/sebastienrousseau/passmcp:<version>
 ARG PASSMCP_VERSION=0.0.1
-FROM ghcr.io/sebastienrousseau/passmcp@sha256:aa9a804dda854897ac8c843935fb12a3829f56702aa3c3d5529d6e54e7e3ac12
+FROM ghcr.io/sebastienrousseau/passmcp@sha256:4dab755abbdbff1079879a834f0f27806c6de7d0c710b85e50e91ae80f412c02
 
 ARG PASSMCP_VERSION
 ARG TARGETPLATFORM

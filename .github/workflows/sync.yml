@@ -73,7 +73,9 @@ jobs:
         run: |
           set -euo pipefail
           ver="${VERSION#v}"
-          if grep -Eq "^## \[${ver}\]" CHANGELOG.md; then
+          # Done only when the section is dated and the image is pinned: a
+          # release branch may have prepared the undated section beforehand.
+          if grep -Eq "^## \[${ver}\] — " CHANGELOG.md && grep -qF "passmcp@${DIGEST}" Dockerfile; then
             echo "already at ${VERSION}"; echo "changed=false" >> "${GITHUB_OUTPUT}"; exit 0
           fi
           # The image builds on passmcp's image for this release: digest and version move together.

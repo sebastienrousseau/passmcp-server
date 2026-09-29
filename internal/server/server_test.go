@@ -210,7 +210,7 @@ func TestCheckRefusals(t *testing.T) {
 	}
 }
 
-func signedStatement(t *testing.T) string {
+func signedStatement(t testing.TB) string {
 	t.Helper()
 	target := attestation.Target{Transport: "http", Endpoint: "https://mcp.example.com/mcp"}
 	st := &attestation.Statement{

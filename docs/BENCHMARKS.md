@@ -29,7 +29,7 @@ Both binaries are built from source, then timed with
 [hyperfine](https://github.com/sharkdp/hyperfine):
 
 ```sh
-GOBIN="$PWD/build/bench" go install satellion.com/passmcp/cmd/passmcp@v0.0.1
+GOBIN="$PWD/build/bench" go install satellion.com/passmcp/cmd/passmcp@v0.0.2
 CGO_ENABLED=0 go build -trimpath -o build/bench/passmcp-server ./cmd/passmcp-server
 
 printf '%s\n' \

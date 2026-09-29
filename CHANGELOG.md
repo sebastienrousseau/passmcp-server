@@ -13,7 +13,9 @@ release — the container image is built on passmcp's image for the same
 version — so its version is passmcp's latest release, exactly, and a release
 here with nothing in it is the version rule working.
 
-## [0.0.2]
+## [Unreleased]
+
+## [0.0.2] — 2026-09-29
 
 The family's second release. The three tools, their arguments and their
 results are the 0.0.1 ones; what changed is how the repository is built,
@@ -36,7 +38,8 @@ checked and documented.
 
 ### Changed
 
-- **passmcp-reporting at its 0.0.1 release.** `go.mod` required a
+- **In lockstep with passmcp 0.0.2.** The image builds on `ghcr.io/sebastienrousseau/passmcp@sha256:fb15e3a3ff2bc2270ce308778ead54da3f10bd0f8160aaab4a06a60a2da6bbdb`, the multi-arch image passmcp's release published for 0.0.2, and every install line and the registry listing name the release. Written by the sync workflow's rewrite step on the release branch; passmcp's own changelog says what changed in the diagnostic.
+- **passmcp-reporting at its 0.0.2 release.** `go.mod` required a
   pre-release pseudo-version; it now requires the tagged release, and
   `make versions` fails when the two disagree.
 - **The README follows the family standard**: the seven-badge row, the
@@ -77,5 +80,6 @@ The first release.
   attestation about one, from inside the editor. The tools are read-only,
   the targets allowlisted, and no credential is ever sent.
 
-[0.0.2]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.2
 [0.0.1]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1

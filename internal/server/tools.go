@@ -278,6 +278,21 @@ func callVerify(_ context.Context, _ *Server, raw json.RawMessage) result {
 		out := verifyOutput{Valid: false, Error: err.Error()}
 		return textResult("Not a valid passmcp attestation: "+err.Error(), out)
 	}
+	out, text := describeStatement(st)
+	if args.Endpoint != "" {
+		text += aboutEndpoint(st, args.Endpoint, &out)
+	}
+	if len(out.Failing) > 0 {
+		text += " Failing: " + strings.Join(out.Failing, ", ") + "."
+	}
+	text += " Validity is structure and integrity; who signed the statement is checked with its envelope, such as cosign or gh attestation verify."
+	return textResult(text, out)
+}
+
+// describeStatement is the structured result and the opening sentence for
+// a statement that validated: its target, score, instrument and the
+// first maxFailures failing checks.
+func describeStatement(st *attestation.Statement) (verifyOutput, string) {
 	p := st.Predicate
 	out := verifyOutput{Valid: true, Endpoint: p.Target.Endpoint}
 	if p.Score != nil {
@@ -293,20 +308,18 @@ func callVerify(_ context.Context, _ *Server, raw json.RawMessage) result {
 		text += fmt.Sprintf(", scored %.0f/100 (%s)", *out.Score, out.Grade)
 	}
 	text += fmt.Sprintf(" by %s %s at %s.", p.Instrument.Name, p.Instrument.Version, p.RanAt.UTC().Format(time.RFC3339))
-	if args.Endpoint != "" {
-		covers := st.Covers("http", args.Endpoint)
-		out.Covers = &covers
-		if covers {
-			text += " It is about " + args.Endpoint + "."
-		} else {
-			text += " It is not about " + args.Endpoint + ", so it is no evidence about that server."
-		}
+	return out, text
+}
+
+// aboutEndpoint records in out whether the statement is about endpoint, and
+// says so.
+func aboutEndpoint(st *attestation.Statement, endpoint string, out *verifyOutput) string {
+	covers := st.Covers("http", endpoint)
+	out.Covers = &covers
+	if covers {
+		return " It is about " + endpoint + "."
 	}
-	if len(out.Failing) > 0 {
-		text += " Failing: " + strings.Join(out.Failing, ", ") + "."
-	}
-	text += " Validity is structure and integrity; who signed the statement is checked with its envelope, such as cosign or gh attestation verify."
-	return textResult(text, out)
+	return " It is not about " + endpoint + ", so it is no evidence about that server."
 }
 
 func callVersion(ctx context.Context, s *Server, raw json.RawMessage) result {

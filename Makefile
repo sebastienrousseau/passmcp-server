@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Sebastien Rousseau <sebastian.rousseau@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-only
 
-.PHONY: all build test test-race coverage vet lint format spdx-check smoke digest readme-check \
-        server-json image lockstep family completions help name-guard
+.PHONY: all build test test-race coverage coverage-json vet lint format spdx-check smoke digest \
+        readme-check server-json image lockstep family completions help name-guard versions
 
 # Every gate CI runs that needs no network, in the order the cheap ones fail
 # first.
@@ -31,8 +31,16 @@ test-race:
 # The gate is 85% statement coverage in every package with statements,
 # except cmd/passmcp-server; ci.yml says why.
 coverage:
+	@mkdir -p build
 	go test -count=1 -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out | tail -1
+
+# The shields.io endpoint document behind the README's coverage badge:
+# statement coverage across the module, as CI measured it. The Manual
+# workflow publishes it with GitHub Pages as coverage.json.
+coverage-json: coverage
+	go run ./scripts/coveragebadge -profile coverage.out > build/coverage.json
+	@cat build/coverage.json
 
 vet:
 	go vet ./...
@@ -93,10 +101,17 @@ lockstep:
 family:
 	scripts/family.sh
 
-help:
-	@printf '%s\n' "targets: all build test test-race coverage vet lint format spdx-check smoke server-json image lockstep family"
+# Every file that names the version names the newest CHANGELOG release,
+# and the passmcp-reporting module is required at that same release.
+versions:
+	scripts/verify-release-versions.sh "v$$(grep -Eo '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -1 | tr -d '#[] ')"
 
-# The project was renamed to passmcp: the old name may appear only in the
-# provenance line (scripts/name-guard.sh).
+help:
+	@printf '%s\n' "targets: all build test test-race coverage coverage-json vet lint format spdx-check smoke" \
+	  "         completions readme-check server-json image digest lockstep family versions name-guard" \
+	  "GNUmakefile: install uninstall install-smoke (PREFIX, DESTDIR)"
+
+# A retired product name may not appear anywhere in the tree
+# (scripts/name-guard.sh).
 name-guard:
 	./scripts/name-guard.sh

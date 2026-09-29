@@ -17,11 +17,24 @@ linters:
     - makezero
     - rowserrcheck
     - noctx
+    # The portfolio's complexity ceilings per function (AGENTS.md §0):
+    # cyclomatic 10, cognitive 15, 60 lines. Every function is under them,
+    # so there is no baseline; a new offender fails the lint job.
+    - gocyclo
+    - gocognit
+    - funlen
     # contextcheck is deliberately absent: every phase derives its per-call
     # context through a closure over the phase context (pctx), and the
     # analyser cannot see through the closure, so it reports every derived
     # context as a new one. Per-file exclusions would hide real findings too.
   settings:
+    gocyclo:
+      min-complexity: 10
+    gocognit:
+      min-complexity: 15
+    funlen:
+      lines: 60
+      statements: -1
     revive:
       rules:
         - name: exported

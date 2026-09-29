@@ -12,12 +12,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/sebastienrousseau/passmcp-server/actions"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/passmcp-server/ci.yml?style=for-the-badge&logo=github" alt="Build Status" /></a>
-  <a href="https://github.com/sebastienrousseau/passmcp-server/pkgs/container/passmcp-server"><img src="https://img.shields.io/badge/ghcr.io-passmcp--server-fc8d62?style=for-the-badge&logo=docker&logoColor=white" alt="Container image" /></a>
-  <a href="https://pkg.go.dev/satellion.com/passmcp-server"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&logo=go&logoColor=white" alt="Go Reference" /></a>
-  <a href="https://scorecard.dev/viewer/?uri=satellion.com/passmcp-server"><img src="https://img.shields.io/ossf-scorecard/satellion.com/passmcp-server?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0--only-blue?style=for-the-badge" alt="License: GPL-3.0-only" /></a>
-  <a href="#requirements"><img src="https://img.shields.io/github/go-mod/go-version/sebastienrousseau/passmcp-server?style=for-the-badge&logo=go&logoColor=white&label=Go" alt="Minimum Go version" /></a>
+  <a href="https://github.com/sebastienrousseau/passmcp-server/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/passmcp-server/ci.yml?branch=main&style=for-the-badge&logo=github&label=Build" alt="Build" /></a>
+  <a href="https://github.com/sebastienrousseau/passmcp-server/blob/main/DEVELOPMENT.md#coverage"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fsebastienrousseau.com%2Fpassmcp-server%2Fcoverage.json&style=for-the-badge&logo=codecov&logoColor=white" alt="Coverage" /></a>
+  <a href="https://github.com/sebastienrousseau/passmcp-server/releases"><img src="https://img.shields.io/github/v/release/sebastienrousseau/passmcp-server?style=for-the-badge&color=fc8d62&logo=github&label=Release" alt="Release" /></a>
+  <a href="https://pkg.go.dev/satellion.com/passmcp-server"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&labelColor=555555&logo=go&logoColor=white" alt="Docs" /></a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/passmcp-server"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/passmcp-server?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--only-blue.svg?style=for-the-badge" alt="License: GPL-3.0-only" /></a>
+  <a href="https://github.com/sebastienrousseau/passmcp-server/blob/main/DEVELOPMENT.md#requirements"><img src="https://img.shields.io/badge/go-1.26.8%2B-93450a.svg?style=for-the-badge&logo=go" alt="Go 1.26.8+" /></a>
 </p>
 
 ---
@@ -26,19 +27,19 @@
 
 **Getting started**
 
-- [Install](#install) — `go install`, the container image, and an MCP host configuration
+- [Install](#install) — release archives, `go install`, `make install`, the container image, and an MCP host configuration
 - [Requirements](#requirements) — passmcp itself, and the Go floor to build from source
 - [Quick Start](#quick-start) — ask the agent to evaluate a local server
 
 **The passmcp-server ecosystem**
 
-- [The passmcp-server ecosystem](#the-passmcp-server-ecosystem) — `passmcp`, `passmcp-reporting`, `passmcp-action`, `passmcp-server`, `passmcp-lsp`, `passmcp-census` at a glance
+- [The passmcp-server ecosystem](#the-passmcp-server-ecosystem) — `passmcp`, `passmcp-reporting`, `passmcp-server`, `passmcp-action`, `passmcp-graph`, `passmcp-registry`, `passmcp-lsp`, `passmcp-census`, `satellion.com`
 
-**Reference**
+**Library reference**
 
-- [Capabilities at a glance](#capabilities-at-a-glance) — the three tools and the protocol surface
-- [Ecosystem comparison](#ecosystem-comparison) — beside running passmcp yourself
-- [Benchmarks](#benchmarks) — what the server adds to a run
+- [Capabilities at a glance](#capabilities-at-a-glance) — the current surface by theme
+- [Ecosystem comparison](#ecosystem-comparison) — short matrix; full table at [`docs/COMPARISON.md`](docs/COMPARISON.md)
+- [Benchmarks](#benchmarks) — headline numbers; full table at [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md)
 - [Features](#features) — the allowlist, no credentials, read-only
 - [Configuration](#configuration) — two flags and their environment variables
 - [Examples](#examples) — tool calls and results
@@ -46,7 +47,7 @@
 **Operational**
 
 - [When not to use passmcp-server](#when-not-to-use-passmcp-server) — limitations
-- [Development](#development) — make targets, CI
+- [Development](#development) — make targets, the install contract, CI
 - [Security](#security) — what an agent can and cannot make it do
 - [Documentation](#documentation) — all reference docs
 - [Stability guarantees](#stability-guarantees) — tool names, arguments and results
@@ -70,6 +71,20 @@ go install satellion.com/passmcp/cmd/passmcp@v0.0.1
 Release binaries for Linux, macOS and Windows on amd64 and arm64 are on
 the [releases page](https://github.com/sebastienrousseau/passmcp-server/releases),
 with signed checksums and SLSA provenance.
+
+### From source, with `make install`
+
+```sh
+git clone https://github.com/sebastienrousseau/passmcp-server
+cd passmcp-server
+make install PREFIX="$HOME/.local"
+```
+
+`make install` builds the binary and its bash, zsh and fish completions and
+installs them under `PREFIX` (default `/usr/local`), staged under `DESTDIR`
+when a packager sets it. `make uninstall` removes them. The
+[GNUmakefile](GNUmakefile) holds the contract, and CI checks the staged tree
+on every push.
 
 ### As a container image
 
@@ -159,24 +174,26 @@ named with `--allow` first.
 
 ## The passmcp-server ecosystem
 
-One engine, three surfaces, five satellites. This repository is the
-distribution surface: its deliverable is a registry listing, so passmcp is
-where agents look for tools.
+Every component is released at **0.0.1** and moves in lockstep: one version across the family, released together ([docs/ecosystem.md](https://github.com/sebastienrousseau/passmcp/blob/main/docs/ecosystem.md)).
 
 | Component | Purpose | Use case |
 | :--- | :--- | :--- |
-| [`passmcp`](https://github.com/sebastienrousseau/passmcp) | The engine, every check, and the CLI, TUI and web surfaces (GPL-3.0-only) | Evaluate a server and write the statement |
-| [`passmcp-reporting`](https://github.com/sebastienrousseau/passmcp-reporting) | The attestation format, its schema and the offline verifier (Apache-2.0) | Gate on a statement in a gateway, registry or pipeline |
-| [`passmcp-action`](https://github.com/sebastienrousseau/passmcp-action) | The GitHub Action and GitLab template wrapping the published image by digest (Apache-2.0) | Run passmcp in CI without installing it |
-| **`passmcp-server`** | passmcp's diagnostics as read-only MCP tools (GPL-3.0-only) | Evaluate a server from inside an editor |
-| `passmcp-lsp` | A language server over MCP artefacts (planned) | Hover a check id for its remediation |
-| `passmcp-census` | The published reliability census (planned) | Reproduce the numbers |
+| [passmcp](https://github.com/sebastienrousseau/passmcp) | The MCP server diagnostic: checks in nine phases, every finding tied to the request that showed it, signed attestations | Test a server before your agents trust it, and gate it in CI |
+| [passmcp-reporting](https://github.com/sebastienrousseau/passmcp-reporting) | The attestation format, its JSON Schemas and offline verifier, the graph model, and the agentgateway processor | Verify an attestation in a gateway, registry or pipeline |
+| [passmcp-server](https://github.com/sebastienrousseau/passmcp-server) | passmcp's diagnostics as read-only MCP tools | Evaluate a server, or check an attestation, from inside the agent |
+| [passmcp-action](https://github.com/sebastienrousseau/passmcp-action) | passmcp in GitHub Actions and GitLab CI, the image pinned by digest | Fail a build on the findings you choose |
+| [passmcp-graph](https://github.com/sebastienrousseau/passmcp-graph) | A local graph of agents, servers, tools and identities built from attestations | Find inherited risk and over-privilege, and gate on policy |
+| [passmcp-registry](https://github.com/sebastienrousseau/passmcp-registry) | A signed public scorecard of the MCP Registry's remote servers | Check a public server's standing before connecting to it |
+| [passmcp-lsp](https://github.com/sebastienrousseau/passmcp-lsp) | A language server for MCP artefacts, with check-id hover from the guidance catalogue | Catch mistakes in server.json, tool schemas and client configuration while editing |
+| [passmcp-census](https://github.com/sebastienrousseau/passmcp-census) | The published reliability census: dataset, methodology, disclosure log and reproduction command | Cite ecosystem-wide reliability figures, and reproduce them |
+| [satellion.com](https://github.com/sebastienrousseau/satellion.github.io) | The website, the Go module paths and the format URIs | Read the manual, and resolve `satellion.com/...` imports |
 
-The family manifest lives in passmcp at
-[`docs/ecosystem.md`](https://github.com/sebastienrousseau/passmcp/blob/main/docs/ecosystem.md);
-`make family` checks this repository's row against it. Every lockstep
-repository carries passmcp's version; this one wraps passmcp's release, so its
-version is passmcp's latest, exactly.
+This repository is the distribution surface: its deliverable is a registry
+listing, so passmcp is where agents look for tools. It wraps passmcp's
+release, so its version is passmcp's latest, exactly; `make lockstep`
+checks that, `make family` checks this repository's row in the family
+manifest, and `make versions` checks that every file naming the version,
+and the passmcp-reporting module in `go.mod`, agree on it.
 
 ---
 
@@ -184,11 +201,11 @@ version is passmcp's latest, exactly.
 
 | Area | Capability | Status |
 | :--- | :--- | :--- |
-| Evaluate | `passmcp_check`: score, grade, counts and up to 25 failing checks for an allowlisted Streamable HTTP endpoint, optionally narrowed to some of passmcp's nine phases | Stable |
-| Verify | `passmcp_verify_attestation`: structure, subject digest and target of a passmcp attestation, offline | Stable |
-| Identify | `passmcp_version`: passmcp-server's version and the passmcp it runs | Stable |
-| Results | Text for the agent, plus `structuredContent` matching each tool's `outputSchema` | Stable |
-| Protocol | stdio; handshake 2025-11-25, 2025-06-18, 2025-03-26; `server/discover` for 2026-07-28; `ping` | Stable |
+| Evaluate | `passmcp_check`: score, grade, counts and up to 25 failing checks for an allowlisted Streamable HTTP endpoint, optionally narrowed to some of passmcp's nine phases | [Released in 0.0.1](https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1) |
+| Verify | `passmcp_verify_attestation`: structure, subject digest and target of a passmcp attestation, offline | [Released in 0.0.1](https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1) |
+| Identify | `passmcp_version`: passmcp-server's version and the passmcp it runs | [Released in 0.0.1](https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1) |
+| Results | Text for the agent, plus `structuredContent` matching each tool's `outputSchema` | [Released in 0.0.1](https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1) |
+| Protocol | stdio; handshake 2025-11-25, 2025-06-18, 2025-03-26; `server/discover` for 2026-07-28; `ping` | [Released in 0.0.1](https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1) |
 | Servers that are programs (`--stdio`) | not through a tool; run `passmcp check --stdio` yourself | Out of scope |
 | Credentials | never sent; every run is `--auth none` | Out of scope by design |
 
@@ -198,9 +215,8 @@ version is passmcp's latest, exactly.
 
 The alternative is running passmcp in a terminal and pasting the report into
 the conversation, or poking the server by hand in an inspector. passmcp-server
-is the first with the decisions made for an agent: which hosts it may
-reach, that no credential travels, and a result sized for a context
-window.
+makes the decisions an agent should not: which hosts it may reach, that
+no credential travels, and a result sized for a context window.
 
 | Approach | An agent can call it | Targets limited by the operator | Scored, with remediation links |
 | :--- | :---: | :---: | :---: |
@@ -208,20 +224,25 @@ window.
 | `passmcp check` in a terminal | no | the operator types the URL | yes |
 | [MCP Inspector](https://github.com/modelcontextprotocol/inspector) | no — a UI for a person | the operator types the URL | no |
 
+See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the evidence and complete matrix.
+
 ---
 
 ## Benchmarks
 
 The server adds a process start and a JSON round trip to a run; the run
 itself is passmcp's, and bounded at five minutes. Measured with
-[hyperfine](https://github.com/sharkdp/hyperfine) on the binaries built
-from this tree.
+[hyperfine](https://github.com/sharkdp/hyperfine) on binaries built from
+this tree and passmcp 0.0.1, on a machine that was running other builds at
+the time, so the spread is wide and the minimum is the better guide.
 
 | Scenario | Result | Environment |
 | :--- | ---: | :--- |
-| Start, `initialize`, `tools/list`, `passmcp_version`, exit | 16 ms mean | Apple A18 Pro, Go 1.27.1, 2026-09-24 |
-| passmcp's full stdio evaluation of passmcp-server | 94 ms mean | same |
+| Start, `initialize`, `tools/list`, `passmcp_version`, exit | 27.2 ms ± 22.2 ms mean, 6.2 ms min (50 runs) | Apple A18 Pro, Go 1.27.1, 2026-09-29, load average 19 |
+| passmcp's full stdio evaluation of passmcp-server | 242.3 ms ± 80.5 ms mean, 148.5 ms min (30 runs) | same |
 | `passmcp_check` against a server | passmcp's own timings, in its report | the target server |
+
+See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for methodology and full results.
 
 ---
 
@@ -338,6 +359,9 @@ make test-race  # race detector, randomised order
 make image      # the container image for this machine, without goreleaser
 make family     # this repository's row in passmcp's family manifest
 make lockstep   # the version is passmcp's latest release
+make versions   # every version-bearing file, and go.mod, name that release
+make coverage-json  # build/coverage.json, the document behind the badge
+make install-smoke  # install and uninstall under a staged DESTDIR
 ```
 
 Every gate CI runs has a local form; [DEVELOPMENT.md](DEVELOPMENT.md) maps
@@ -373,8 +397,12 @@ The four entry points, identical across every repo in the family:
 
 | Document | Covers |
 |---|---|
-| [`docs/publishing.md`](docs/publishing.md) | Publishing the registry listing |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | How a call flows, the packages, and the settings every run is fixed to |
 | [`docs/adr/`](docs/adr/README.md) | Decision records for this repository |
+| [`docs/COMPARISON.md`](docs/COMPARISON.md) | passmcp-server beside the other ways to run passmcp |
+| [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) | What the server adds to a run, and how it was measured |
+| [`docs/publishing.md`](docs/publishing.md) | Publishing the registry listing |
+| [`docs/releases/`](docs/releases/v0.0.1.md) | Release highlights, one file per release |
 | [`server.json`](server.json) | The MCP Registry listing |
 | [`SECURITY.md`](SECURITY.md) | Disclosure policy, supported versions, what is guaranteed |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Signed-commit and DCO policy, what a change needs |

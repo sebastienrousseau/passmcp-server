@@ -46,5 +46,13 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Architecture: ARCHITECTURE.md
+  - Comparison: COMPARISON.md
+  - Benchmarks: BENCHMARKS.md
   - Publishing to the registry: publishing.md
-  - Decision records: adr/README.md
+  - Decision records:
+      - adr/README.md
+      - adr/0001-run-passmcp-as-a-program.md
+      - adr/0002-loopback-only-allowlist.md
+      - adr/0003-no-operator-configuration-credentials-or-mutations.md
+      - adr/0004-version-in-lockstep-with-passmcp.md

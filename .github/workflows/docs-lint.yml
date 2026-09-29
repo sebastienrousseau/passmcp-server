@@ -29,7 +29,7 @@ jobs:
         env:
           GOTOOLCHAIN: auto
         run: make spdx-check
-      - name: The retired name appears only in the provenance line
+      - name: No retired product name appears in the tree
         run: ./scripts/name-guard.sh
 
   markdown:

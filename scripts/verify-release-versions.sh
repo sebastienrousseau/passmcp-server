@@ -3,8 +3,11 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # Fail unless every place that names the version being released names it:
-# the CHANGELOG heading, the README's install snippets, the registry
-# listing in server.json, and the passmcp release the Dockerfile builds on.
+# the CHANGELOG heading, the install snippets in the README and docs, the
+# version the README's ecosystem section states, CITATION.cff, the registry
+# listing in server.json, the passmcp release the Dockerfile builds on, and
+# the passmcp-reporting release go.mod requires. The family moves in lockstep,
+# so every one of them is the same version.
 #
 #   scripts/verify-release-versions.sh v0.0.1
 set -euo pipefail
@@ -16,9 +19,27 @@ fail=0
 
 grep -Eq "^## \[$ver\]" CHANGELOG.md || { echo "CHANGELOG.md has no '## [$ver]' heading" >&2; fail=1; }
 
-# Both install lines: passmcp-server's, and the passmcp it runs.
-if grep -Eo 'sebastienrousseau/passmcp(-mcp)?/cmd/passmcp(-mcp)?@v[0-9]+\.[0-9]+\.[0-9]+' README.md | grep -v "@v$ver\$"; then
-  echo "README.md pins a go install version other than $ver" >&2; fail=1
+# Both install lines, passmcp-server's and the passmcp it runs; at least
+# one must be there, so a path that stops matching cannot pass silently.
+installs=$(grep -Eoh 'satellion\.com/passmcp(-server)?/cmd/passmcp(-server)?@v[0-9]+\.[0-9]+\.[0-9]+' README.md docs/*.md || true)
+if [ -z "$installs" ]; then
+  echo "README.md names no go install line to check" >&2; fail=1
+elif grep -v "@v$ver\$" <<<"$installs"; then
+  echo "the docs pin a go install version other than $ver" >&2; fail=1
+fi
+
+# The ecosystem section states the family's one version.
+if ! grep -Fq "Every component is released at **$ver**" README.md; then
+  echo "README.md's ecosystem section does not state $ver" >&2; fail=1
+fi
+
+if ! grep -Eq "^version: \"?$ver\"?\$" CITATION.cff; then
+  echo "CITATION.cff does not say version $ver" >&2; fail=1
+fi
+
+# The attestation verifier comes from passmcp-reporting at the same release.
+if ! grep -Eq "satellion\.com/passmcp-reporting v$ver\$" go.mod; then
+  echo "go.mod does not require satellion.com/passmcp-reporting v$ver" >&2; fail=1
 fi
 if grep -Eo 'ghcr\.io/sebastienrousseau/passmcp-server:[0-9]+\.[0-9]+\.[0-9]+' README.md docs/*.md | grep -v ":$ver\$"; then
   echo "the docs pin an image version other than $ver" >&2; fail=1

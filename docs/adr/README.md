@@ -9,15 +9,13 @@ decision that changes gets a new record superseding the old one.
 
 Decisions about the checks, the score and the attestation format are
 passmcp's, in [passmcp's ADRs](https://github.com/sebastienrousseau/passmcp/blob/main/docs/adr/README.md).
-This directory records what is decided here.
-
-There are no records yet. The two decisions made so far are documented
-where they are enforced: running passmcp as a program rather than linking
-its engine, with the settings every run is fixed to, in the package
-documentation of `internal/runner`; and the loopback-only default
-allowlist, in `internal/server/allow.go`. The first change to either
-starts a record here.
+This directory records what is decided here. The four records below were
+made with the first commit and written down afterwards, from the package
+documentation and tests that enforce them.
 
 | # | Decision | Status |
 |---|---|---|
-| — | none yet | — |
+| [0001](0001-run-passmcp-as-a-program.md) | Run the passmcp program; do not link its engine | Accepted |
+| [0002](0002-loopback-only-allowlist.md) | The allowlist is on by default and allows loopback only | Accepted |
+| [0003](0003-no-operator-configuration-credentials-or-mutations.md) | No operator configuration, no credentials, no mutations | Accepted |
+| [0004](0004-version-in-lockstep-with-passmcp.md) | The version is passmcp's latest release, and the image is passmcp's | Accepted |

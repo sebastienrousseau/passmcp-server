@@ -41,10 +41,16 @@ fi
 if [ "$lockstep" != "true" ] || [ ! -x scripts/lockstep.sh ]; then
   echo "family: the manifest says lockstep=$lockstep and this repository carries passmcp's version" >&2; fail=1
 fi
-if [ "$status" != "shipping" ]; then
-  # The row flips to shipping in the passmcp release after this repository's
-  # first; until then the facts above are what can be checked.
-  echo "::warning::family: the manifest still lists passmcp-server as $status"
-fi
+# Manifest schema 2 names a released component "released"; schema 1, which
+# passmcp's main serves until its 0.0.2 release, said "shipping". Both mean
+# the same row, so both are accepted until every reader is on schema 2.
+case "$status" in
+  released | shipping) ;;
+  *)
+    # The row flips to released in the passmcp release after this
+    # repository's first; until then the facts above are what can be checked.
+    echo "::warning::family: the manifest still lists passmcp-server as $status"
+    ;;
+esac
 [ "$fail" -eq 0 ] && echo "family: the manifest's row for passmcp-server is true of this tree ($licence, $language, lockstep=$lockstep, $status)"
 exit "$fail"

@@ -165,6 +165,14 @@ jobs:
         env:
           GOTOOLCHAIN: auto
         run: make completions
+      # GNUmakefile's install contract: every file lands under PREFIX in a
+      # staged DESTDIR, the binary runs, and uninstall leaves nothing.
+      - name: make install under DESTDIR produces a correct tree
+        env:
+          GOTOOLCHAIN: auto
+        run: make install-smoke
+      - name: Every version-bearing file names the newest release
+        run: make versions
       - name: server.json validates against the registry schema it names
         run: make server-json CHECK_JSONSCHEMA='pipx run check-jsonschema'
       - name: This repository's row in the family manifest is true

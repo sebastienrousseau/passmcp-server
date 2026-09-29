@@ -18,25 +18,7 @@ import (
 var skipDirs = map[string]bool{".git": true, "build": true, "dist": true, "vendor": true, "node_modules": true, "site": true}
 
 func main() {
-	var missing []string
-	err := filepath.WalkDir(".", func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() {
-			if skipDirs[d.Name()] && path != "." {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if !wants(path) {
-			return nil
-		}
-		if !hasHeader(path) {
-			missing = append(missing, path)
-		}
-		return nil
-	})
+	missing, err := findMissing(".")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -53,20 +35,62 @@ func main() {
 	fmt.Println("spdx-check: every source file carries a license header")
 }
 
+// findMissing walks root and returns every source file without a header.
+func findMissing(root string) ([]string, error) {
+	var missing []string
+	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			if skipDirs[d.Name()] && path != root {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if wants(path) && !hasHeader(path) {
+			missing = append(missing, path)
+		}
+		return nil
+	})
+	return missing, err
+}
+
+// skipFiles take no header: their formats have no comments, or REUSE.toml
+// annotates them.
+var skipFiles = map[string]bool{
+	"go.mod": true, "go.sum": true, "LICENSE": true, "flake.lock": true, "CODEOWNERS": true,
+	"CITATION.cff": true, ".gitignore": true, ".gitattributes": true, ".DS_Store": true,
+}
+
+// checkedDotfiles are the dotfile prefixes that are configuration worth a
+// header; every other dotfile is skipped.
+var checkedDotfiles = []string{".golangci", ".goreleaser", ".pre-commit", ".editorconfig", ".markdownlint", ".gitleaks"}
+
+// checkedExts are the extensions whose files carry a header.
+var checkedExts = map[string]bool{
+	".go": true, ".sh": true, ".yml": true, ".yaml": true, ".md": true,
+	".toml": true, ".jsonc": true, ".nix": true, ".svg": true,
+}
+
 func wants(path string) bool {
 	base := filepath.Base(path)
-	switch base {
-	case "go.mod", "go.sum", "LICENSE", "flake.lock", "CODEOWNERS", "CITATION.cff", ".gitignore", ".gitattributes", ".DS_Store":
+	if skipFiles[base] || (strings.HasPrefix(base, ".") && !hasAnyPrefix(base, checkedDotfiles)) {
 		return false
 	}
-	if strings.HasPrefix(base, ".") && !strings.HasPrefix(base, ".golangci") && !strings.HasPrefix(base, ".goreleaser") && !strings.HasPrefix(base, ".pre-commit") && !strings.HasPrefix(base, ".editorconfig") && !strings.HasPrefix(base, ".markdownlint") && !strings.HasPrefix(base, ".gitleaks") {
-		return false
-	}
-	switch filepath.Ext(path) {
-	case ".go", ".sh", ".yml", ".yaml", ".md", ".toml", ".jsonc", ".nix", ".svg":
+	if checkedExts[filepath.Ext(path)] {
 		return true
 	}
 	return base == "Makefile" || base == "GNUmakefile" || base == "Dockerfile" || strings.HasPrefix(base, ".editorconfig")
+}
+
+func hasAnyPrefix(s string, prefixes []string) bool {
+	for _, p := range prefixes {
+		if strings.HasPrefix(s, p) {
+			return true
+		}
+	}
+	return false
 }
 
 func hasHeader(path string) bool {

@@ -39,23 +39,39 @@ func ParseAllowlist(s string) Allowlist {
 
 // Check returns why endpoint is refused, or nil.
 func (a Allowlist) Check(endpoint string) error {
-	u, err := url.Parse(endpoint)
-	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Hostname() == "" {
-		return fmt.Errorf("%q is not an http or https URL; pass the server's Streamable HTTP endpoint, such as http://127.0.0.1:3000/mcp", endpoint)
-	}
-	if u.User != nil {
-		return fmt.Errorf("%q carries credentials in the URL; passmcp-server never sends credentials, so pass the endpoint without them", endpoint)
+	u, err := parseEndpoint(endpoint)
+	if err != nil {
+		return err
 	}
 	host := strings.ToLower(u.Hostname())
-	if loopback(host) {
+	if loopback(host) || a.permits(host) {
 		return nil
 	}
+	return fmt.Errorf("%s is not on this server's allowlist, which permits loopback addresses%s; the operator widens it with --allow or PASSMCP_SERVER_ALLOW", host, a.describe())
+}
+
+// parseEndpoint accepts an http or https URL with a host and no
+// credentials in it, and says why anything else is refused.
+func parseEndpoint(endpoint string) (*url.URL, error) {
+	u, err := url.Parse(endpoint)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Hostname() == "" {
+		return nil, fmt.Errorf("%q is not an http or https URL; pass the server's Streamable HTTP endpoint, such as http://127.0.0.1:3000/mcp", endpoint)
+	}
+	if u.User != nil {
+		return nil, fmt.Errorf("%q carries credentials in the URL; passmcp-server never sends credentials, so pass the endpoint without them", endpoint)
+	}
+	return u, nil
+}
+
+// permits reports whether host is named exactly, or falls under a
+// leading-dot suffix entry.
+func (a Allowlist) permits(host string) bool {
 	for _, h := range a.Hosts {
 		if host == h || (strings.HasPrefix(h, ".") && strings.HasSuffix(host, h)) {
-			return nil
+			return true
 		}
 	}
-	return fmt.Errorf("%s is not on this server's allowlist, which permits loopback addresses%s; the operator widens it with --allow or PASSMCP_SERVER_ALLOW", host, a.describe())
+	return false
 }
 
 func (a Allowlist) describe() string {

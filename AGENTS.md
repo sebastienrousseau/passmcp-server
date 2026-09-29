@@ -14,12 +14,17 @@ every CI gate.
 |---|---|
 | 85% statement coverage, every package with statements but `cmd/passmcp-server` | `make coverage` |
 | Race detector, randomised order | `make test-race` |
-| Lint at zero findings | `make lint` |
+| Lint at zero findings, complexity ceilings included | `make lint` |
 | SPDX header on every source file | `make spdx-check` |
 | The server answers over stdio | `make smoke` |
 | `server.json` matches the registry schema | `make server-json` |
 | The family manifest's row is true | `make family` |
 | The version is passmcp's latest release | `make lockstep` |
+| Every version-bearing file and `go.mod` agree | `make versions` |
+| The Dockerfile's digest is passmcp's image for its version | `make digest` |
+| `make install` under `DESTDIR` is correct | `make install-smoke` |
+| The README follows the portfolio template | `make readme-check` |
+| No retired product name in the tree | `make name-guard` |
 | passmcp scores this server 90 or more | the `dogfood` job in `ci.yml` |
 
 ## Commits
@@ -36,8 +41,13 @@ every CI gate.
 - **The version is passmcp's latest release, exactly.** Never choose one
   here. It lives in the newest `## [x.y.z]` heading in `CHANGELOG.md`,
   and `scripts/verify-release-versions.sh` checks every other place that
-  names it: the README's install lines, `server.json`, and
-  `PASSMCP_VERSION` in the `Dockerfile`.
+  names it: the install lines in the README and docs, the README's
+  ecosystem sentence, `CITATION.cff`, `server.json`, `PASSMCP_VERSION` in
+  the `Dockerfile`, and the passmcp-reporting release `go.mod` requires.
+- **A capability's status names its release.** "Released in X.Y.Z"
+  linking that release, or "Not yet released" linking the CHANGELOG's
+  Unreleased section; never "Stable", "Shipping" or "Planned". A
+  capability released in 0.0.1 stays "Released in 0.0.1".
 - `main.Version` is stamped by the release build through `-ldflags`;
   never hard-code a version there.
 - The Dockerfile's base digest and `PASSMCP_VERSION` move together, to

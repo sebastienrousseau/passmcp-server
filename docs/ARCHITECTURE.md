@@ -13,6 +13,11 @@ Apache-2.0 verifier from
 
 ## The two decisions
 
+Both are recorded, with the alternatives, in
+[ADR 0001](adr/0001-run-passmcp-as-a-program.md) and
+[ADR 0003](adr/0003-no-operator-configuration-credentials-or-mutations.md);
+the allowlist's default is [ADR 0002](adr/0002-loopback-only-allowlist.md).
+
 **Run the passmcp program; do not link its engine.** passmcp's engine lives
 in its `internal` packages, which cannot be imported, and linking a copy
 would tie this server to one build of it. passmcp-server runs the same binary
@@ -62,7 +67,8 @@ minute, and a client that wants two at once can start two servers.
 
 | Path | Role |
 | :--- | :--- |
-| `cmd/passmcp-server` | Flags (`--allow`, `--passmcp`, `--version`) and the stdio loop |
+| `cmd/passmcp-server` | Flags (`--allow`, `--passmcp`, `--version`, `--completion`), shell completions generated from the flag set, and the stdio loop |
+| `scripts/coveragebadge` | Turns a Go cover profile into the shields.io endpoint document behind the README's coverage badge |
 | `internal/server` | JSON-RPC handling, the handshake revisions and `server/discover`, the tool definitions, the allowlist, and attestation checks through passmcp-reporting's verifier |
 | `internal/runner` | Runs the passmcp program with the fixed flags and environment, and parses its report |
 
@@ -82,5 +88,6 @@ Releases ship binaries and a container image built on passmcp's own image,
 pinned by digest, so the image carries the passmcp it runs. The listing in
 the MCP Registry is `com.sebastienrousseau/passmcp-server`. Releases
 follow passmcp's in lockstep: passmcp's release dispatch opens a sync pull
-request that moves the image digest, `PASSMCP_VERSION`, the install lines
-and `server.json` together.
+request that moves the image digest, `PASSMCP_VERSION`, the install lines,
+`server.json`, `CITATION.cff` and the passmcp-reporting requirement in
+`go.mod` together ([ADR 0004](adr/0004-version-in-lockstep-with-passmcp.md)).

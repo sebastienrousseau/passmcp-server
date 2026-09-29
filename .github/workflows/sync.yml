@@ -59,6 +59,12 @@ jobs:
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
           echo "digest=${digest}" >> "${GITHUB_OUTPUT}"
 
+      # go.mod moves to passmcp-reporting's release for the same version.
+      - name: Set up Go from go.mod
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+
       - name: Rewrite the pins and the changelog
         id: edit
         env:
@@ -67,13 +73,20 @@ jobs:
         run: |
           set -euo pipefail
           ver="${VERSION#v}"
-          if grep -Eq "^## \[${ver}\]" CHANGELOG.md; then
+          # Done only when the section is dated and the image is pinned: a
+          # release branch may have prepared the undated section beforehand.
+          if grep -Eq "^## \[${ver}\] — " CHANGELOG.md && grep -qF "passmcp@${DIGEST}" Dockerfile; then
             echo "already at ${VERSION}"; echo "changed=false" >> "${GITHUB_OUTPUT}"; exit 0
           fi
           # The image builds on passmcp's image for this release: digest and version move together.
           sed -i -E "s|^FROM ghcr.io/sebastienrousseau/passmcp@sha256:[0-9a-f]{64}$|FROM ghcr.io/sebastienrousseau/passmcp@${DIGEST}|; s|^ARG PASSMCP_VERSION=[0-9.]+$|ARG PASSMCP_VERSION=${ver}|" Dockerfile
-          sed -i -E "s#(sebastienrousseau/passmcp(-mcp)?/cmd/passmcp(-mcp)?)@v[0-9]+\.[0-9]+\.[0-9]+#\1@${VERSION}#g; s#ghcr\.io/sebastienrousseau/passmcp-server:[0-9]+\.[0-9]+\.[0-9]+#ghcr.io/sebastienrousseau/passmcp-server:${ver}#g" README.md docs/*.md
+          sed -i -E "s#(satellion\.com/passmcp(-server)?/cmd/passmcp(-server)?)@v[0-9]+\.[0-9]+\.[0-9]+#\1@${VERSION}#g; s#ghcr\.io/sebastienrousseau/passmcp-server:[0-9]+\.[0-9]+\.[0-9]+#ghcr.io/sebastienrousseau/passmcp-server:${ver}#g; s#(Every component is released at \*\*)[0-9]+\.[0-9]+\.[0-9]+\*\*#\1${ver}**#" README.md docs/*.md
           today=$(date -u +%Y-%m-%d)
+          sed -i -E "s/^version: .*/version: ${ver}/; s/^date-released: .*/date-released: \"${today}\"/" CITATION.cff
+          # passmcp-reporting tags before passmcp, so its release for this
+          # version exists by the time passmcp's dispatch arrives here.
+          go get "satellion.com/passmcp-reporting@${VERSION}"
+          go mod tidy
           python3 - "$ver" "$today" "$DIGEST" <<'PY'
           import json, re, sys
           ver, today, digest = sys.argv[1:]
@@ -84,11 +97,20 @@ jobs:
                   p["identifier"] = re.sub(r":[0-9.]+$", ":" + ver, p["identifier"])
           open("server.json", "w").write(json.dumps(s, indent=2) + "\n")
           def release_changelog(c, ver, today, bullet):
-              """Open the section for ver above the unreleased entries, with the
-              lockstep bullet first under ### Changed: merged into an existing
-              Changed list, or a new one placed in Keep a Changelog's order."""
-              head = "## [Unreleased]\n"
-              start = c.index(head) + len(head)
+              """Date the section for ver, with the lockstep bullet first under
+              ### Changed: merged into an existing Changed list, or a new one
+              placed in Keep a Changelog's order. The entries come from an
+              undated ## [ver] section the release branch opened ahead of the
+              release, or else from ## [Unreleased]; an empty ## [Unreleased]
+              is left above it either way."""
+              opened = (re.search(rf"(?m)^## \[{re.escape(ver)}\]\n", c)
+                        or re.search(r"(?m)^## \[Unreleased\]\n", c))
+              if not opened:
+                  sys.exit(f"CHANGELOG.md has neither an undated ## [{ver}] nor a ## [Unreleased] section")
+              start = opened.end()
+              # An empty ## [Unreleased] just above a pre-opened section is
+              # the one re-added below, not a second one.
+              before = re.sub(r"(?m)^## \[Unreleased\]\n\s*\Z", "", c[:opened.start()])
               nxt = re.search(r"(?m)^## \[", c[start:])
               end = start + nxt.start() if nxt else len(c)
               pending = c[start:end].strip("\n")
@@ -103,9 +125,9 @@ jobs:
               names = sorted(blocks, key=lambda n: canon.index(n) if n in canon else len(canon))
               body = "\n\n".join(f"### {n}\n\n{blocks[n]}" for n in names)
               section = f"## [{ver}] — {today}\n\n" + (lead + "\n\n" if lead else "") + body + "\n\n"
-              c = c[:start] + "\n" + section + c[end:]
-              return re.sub(r"\[Unreleased\]: (.*)/compare/v[0-9.]+\.\.\.HEAD",
-                            rf"[Unreleased]: \1/compare/v{ver}...HEAD\n[{ver}]: \1/releases/tag/v{ver}", c)
+              c = before + "## [Unreleased]\n\n" + section + c[end:]
+              return re.sub(rf"(?m)^\[(?:Unreleased|{re.escape(ver)})\]: (.*)/compare/v[0-9.]+\.\.\.HEAD$",
+                            rf"[Unreleased]: \1/compare/v{ver}...HEAD\n[{ver}]: \1/releases/tag/v{ver}", c, count=1)
           c = open("CHANGELOG.md").read()
           bullet = (f"- **In lockstep with passmcp {ver}.** The image builds on "
                    f"`ghcr.io/sebastienrousseau/passmcp@{digest}`, the multi-arch image passmcp's release published for {ver}, and every "

@@ -5,20 +5,20 @@ name: Manual
 
 # Builds the manual on every change to it, strictly, so a broken link or
 # nav entry fails the pull request rather than the reader; and deploys it
-# to GitHub Pages from main.
+# to GitHub Pages from main, with coverage.json beside it: the shields.io
+# endpoint document behind the README's coverage badge, measured from the
+# commit being deployed. Every push to main deploys, so the badge follows
+# the code, not only the docs.
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'docs/**'
-      - 'mkdocs.yml'
-      - '.github/workflows/manual.yml'
   pull_request:
     branches: [main]
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
+      - 'scripts/coveragebadge/**'
       - '.github/workflows/manual.yml'
   workflow_dispatch:
 
@@ -55,6 +55,19 @@ jobs:
           python3 -m pip install --quiet --disable-pip-version-check \
             --require-hashes -r docs/requirements.txt
           mkdocs build --strict --site-dir public
+
+      - name: Set up Go from go.mod
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+
+      # Statement coverage across the module, as the badge shows it. The
+      # per-package gate is ci.yml's Coverage Gate; this only reports.
+      - name: Measure coverage for the badge
+        run: |
+          set -euo pipefail
+          make coverage-json
+          cp build/coverage.json public/coverage.json
 
       - name: Upload the site for Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

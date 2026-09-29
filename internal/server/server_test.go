@@ -90,7 +90,16 @@ func TestHandshakeAndList(t *testing.T) {
 	if _, ok := got["2"]["result"]; !ok {
 		t.Errorf("ping = %v", got["2"])
 	}
-	list := got["3"]["result"].(map[string]any)["tools"].([]any)
+	checkToolList(t, got["3"]["result"].(map[string]any)["tools"].([]any))
+	if len(got) != 4 {
+		t.Errorf("the notification was answered: %d responses", len(got))
+	}
+}
+
+// checkToolList asserts there are three tools, each read-only, described,
+// and with an output schema.
+func checkToolList(t *testing.T, list []any) {
+	t.Helper()
 	if len(list) != 3 {
 		t.Fatalf("%d tools", len(list))
 	}
@@ -103,9 +112,6 @@ func TestHandshakeAndList(t *testing.T) {
 		if tool["outputSchema"] == nil || tool["description"] == "" {
 			t.Errorf("%s lacks an output schema or a description", tool["name"])
 		}
-	}
-	if len(got) != 4 {
-		t.Errorf("the notification was answered: %d responses", len(got))
 	}
 }
 
@@ -227,25 +233,35 @@ func signedStatement(t *testing.T) string {
 	return string(b)
 }
 
+// verifyCall calls passmcp_verify_attestation with args and returns the
+// result's text, error flag and structured content.
+func verifyCall(t *testing.T, s *Server, args any) (string, bool, map[string]any) {
+	t.Helper()
+	return resultOf(t, exchange(t, s, call("passmcp_verify_attestation", args))["7"])
+}
+
 func TestVerifyAttestation(t *testing.T) {
 	s := &Server{Runner: &fakeRunner{}}
 	good := signedStatement(t)
 
-	text, isErr, st := resultOf(t, exchange(t, s, call("passmcp_verify_attestation", map[string]any{"statement": good, "endpoint": "https://mcp.example.com/mcp"}))["7"])
+	text, isErr, st := verifyCall(t, s, map[string]any{"statement": good, "endpoint": "https://mcp.example.com/mcp"})
 	if isErr || st["valid"] != true || st["covers"] != true || st["score"].(float64) != 88 || !strings.Contains(text, "Failing: protocol.origin") {
 		t.Errorf("good: %v %q %v", isErr, text, st)
 	}
-	_, _, st = resultOf(t, exchange(t, s, call("passmcp_verify_attestation", map[string]any{"statement": good, "endpoint": "https://other.example/mcp"}))["7"])
-	if st["covers"] != false {
+	if _, _, st = verifyCall(t, s, map[string]any{"statement": good, "endpoint": "https://other.example/mcp"}); st["covers"] != false {
 		t.Errorf("other endpoint: %v", st)
 	}
-	tampered := strings.Replace(good, "https://mcp.example.com/mcp", "https://evil.example/mcp", 1)
-	text, isErr, st = resultOf(t, exchange(t, s, call("passmcp_verify_attestation", map[string]any{"statement": tampered}))["7"])
+}
+
+func TestVerifyAttestationRefusals(t *testing.T) {
+	s := &Server{Runner: &fakeRunner{}}
+	tampered := strings.Replace(signedStatement(t), "https://mcp.example.com/mcp", "https://evil.example/mcp", 1)
+	text, isErr, st := verifyCall(t, s, map[string]any{"statement": tampered})
 	if isErr || st["valid"] != false || !strings.Contains(text, "Not a valid") {
 		t.Errorf("tampered: %v %q %v", isErr, text, st)
 	}
 	for _, args := range []any{map[string]any{"statement": ""}, map[string]any{"x": 1}} {
-		if _, isErr, _ := resultOf(t, exchange(t, s, call("passmcp_verify_attestation", args))["7"]); !isErr {
+		if _, isErr, _ := verifyCall(t, s, args); !isErr {
 			t.Errorf("%v was not refused", args)
 		}
 	}

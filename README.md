@@ -68,8 +68,8 @@ image carries it. `passmcp_verify_attestation` needs nothing but passmcp-server.
 ### As a Go program
 
 ```sh
-go install satellion.com/passmcp-server/cmd/passmcp-server@v0.0.3
-go install satellion.com/passmcp/cmd/passmcp@v0.0.3
+go install satellion.com/passmcp-server/cmd/passmcp-server@v0.0.4
+go install satellion.com/passmcp/cmd/passmcp@v0.0.4
 ```
 
 Release binaries for Linux, macOS and Windows on amd64 and arm64 are on
@@ -93,7 +93,7 @@ on every push.
 ### As a container image
 
 ```sh
-docker pull ghcr.io/sebastienrousseau/passmcp-server:0.0.3
+docker pull ghcr.io/sebastienrousseau/passmcp-server:0.0.4
 ```
 
 The image is passmcp's own release image with passmcp-server added: distroless,
@@ -124,7 +124,7 @@ With the container image instead:
   "mcpServers": {
     "passmcp": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "ghcr.io/sebastienrousseau/passmcp-server:0.0.3"]
+      "args": ["run", "-i", "--rm", "ghcr.io/sebastienrousseau/passmcp-server:0.0.4"]
     }
   }
 }
@@ -158,8 +158,8 @@ patch release like everything else pre-1.0, and the changelog says so.
 ## Quick Start
 
 ```sh
-go install satellion.com/passmcp-server/cmd/passmcp-server@v0.0.3
-go install satellion.com/passmcp/cmd/passmcp@v0.0.3
+go install satellion.com/passmcp-server/cmd/passmcp-server@v0.0.4
+go install satellion.com/passmcp/cmd/passmcp@v0.0.4
 claude mcp add passmcp -- passmcp-server
 ```
 
@@ -178,7 +178,7 @@ named with `--allow` first.
 
 ## The passmcp-server ecosystem
 
-Every component is released at **0.0.3** and moves in lockstep: one version across the family, released together ([docs/ecosystem.md](https://github.com/sebastienrousseau/passmcp/blob/main/docs/ecosystem.md)).
+Every component is released at **0.0.4** and moves in lockstep: one version across the family, released together ([docs/ecosystem.md](https://github.com/sebastienrousseau/passmcp/blob/main/docs/ecosystem.md)).
 
 | Component | Purpose | Use case |
 | :--- | :--- | :--- |

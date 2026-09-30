@@ -15,6 +15,18 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
+### Added
+
+- **A README demo**, rendered from `.github/demo.tape` by `make demo`: an
+  agent's view of the server over stdio: its version tool, then a real
+  passmcp check of an example MCP server through it.
+
+### Changed
+
+- **Release pages are published in the family layout** by the release
+  workflow itself (Highlights, What's Changed, Checksums, Full Changelog),
+  so no page is rewritten by hand after a release.
+
 ## [0.0.3] — 2026-09-30
 
 The family's third release. The three tools, their arguments and their

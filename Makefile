@@ -79,8 +79,8 @@ smoke:
 demo:
 	@mkdir -p build/demo
 	ver="$$(grep -Eo '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -1 | tr -d '#[] ')"; \
-	  GOBIN="$(CURDIR)/build/demo" go install "satellion.com/passmcp/cmd/passmcp@v$${ver}" "satellion.com/passmcp/examples/servers@v$${ver}"
-	CGO_ENABLED=0 go build -trimpath -o build/demo/passmcp-server ./cmd/passmcp-server
+	  GOBIN="$(CURDIR)/build/demo" go install "satellion.com/passmcp/cmd/passmcp@v$${ver}" "satellion.com/passmcp/examples/servers@v$${ver}" && \
+	  CGO_ENABLED=0 go build -trimpath -ldflags "-X main.Version=$${ver}" -o build/demo/passmcp-server ./cmd/passmcp-server
 	PATH="$(CURDIR)/build/demo:$$PATH" vhs .github/demo.tape
 
 # server.json against the registry schema it names. Needs the network and

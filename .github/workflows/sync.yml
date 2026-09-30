@@ -4,8 +4,10 @@
 # The version rule, rule 2: a passmcp release propagates here automatically.
 # passmcp's release workflow fires repository_dispatch with the version and
 # the multi-arch image digest; this moves the Dockerfile onto that image,
-# moves every version pin, opens a changelog section, and raises a pull
-# request. Commits are made through the API so GitHub signs them.
+# moves every version pin and dates the changelog section. When the release
+# branch feat/vX.Y.Z exists, the commits land on it, so the release stays
+# one pull request; otherwise a pull request is raised. Commits are made
+# through the API so GitHub signs them.
 name: Sync with a passmcp release
 
 on:
@@ -29,9 +31,33 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      - name: Choose the branch to sync
+        id: target
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DISPATCHED_VERSION: ${{ github.event.client_payload.version }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version="${DISPATCHED_VERSION:-${INPUT_VERSION}}"
+          [[ "${version}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must be vX.Y.Z, got '${version}'"; exit 1; }
+          # A family release is one feat/vX.Y.Z branch and one pull request
+          # into main. When that branch exists, the pins are committed onto
+          # it and no second pull request is opened; otherwise a pull
+          # request against the ref this workflow ran on is.
+          if gh api "repos/${REPO}/git/ref/heads/feat/${version}" >/dev/null 2>&1; then
+            echo "ref=feat/${version}" >> "${GITHUB_OUTPUT}"
+            echo "direct=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "ref=${GITHUB_REF_NAME}" >> "${GITHUB_OUTPUT}"
+            echo "direct=false" >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ steps.target.outputs.ref }}
           persist-credentials: false
 
       - name: Resolve the version and the image digest
@@ -131,7 +157,7 @@ jobs:
           c = open("CHANGELOG.md").read()
           bullet = (f"- **In lockstep with passmcp {ver}.** The image builds on "
                    f"`ghcr.io/sebastienrousseau/passmcp@{digest}`, the multi-arch image passmcp's release published for {ver}, and every "
-                   "install line and the registry listing name the release. Opened by the sync workflow on the release's dispatch; "
+                   "install line and the registry listing name the release. Written by the sync workflow for passmcp's release; "
                    "passmcp's own changelog says what changed in the diagnostic.")
           c = release_changelog(c, ver, today, bullet)
           open("CHANGELOG.md", "w").write(c)
@@ -153,11 +179,17 @@ jobs:
           SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
           VERSION: ${{ steps.rel.outputs.version }}
           REPO: ${{ github.repository }}
+          TARGET: ${{ steps.target.outputs.ref }}
+          DIRECT: ${{ steps.target.outputs.direct }}
         run: |
           set -euo pipefail
-          branch="sync/${VERSION}"
-          base=$(git rev-parse HEAD)
-          gh api --method POST "repos/${REPO}/git/refs" -f ref="refs/heads/${branch}" -f sha="${base}" >/dev/null
+          if [[ "${DIRECT}" == true ]]; then
+            branch="${TARGET}"
+          else
+            branch="sync/${VERSION}"
+            base=$(git rev-parse HEAD)
+            gh api --method POST "repos/${REPO}/git/refs" -f ref="refs/heads/${branch}" -f sha="${base}" >/dev/null
+          fi
           # One API commit per changed file: each is signed by GitHub, which
           # is what the signed-commit rule asks for and a runner cannot do.
           for f in $(git diff --name-only); do
@@ -166,6 +198,10 @@ jobs:
               -f message="chore: pin the passmcp ${VERSION} image in ${f}" \
               -f content="$(base64 -w0 "${f}")" -f sha="${sha}" -f branch="${branch}" >/dev/null
           done
+          if [[ "${DIRECT}" == true ]]; then
+            echo "committed the pins to ${branch}; its pull request is the review"
+            exit 0
+          fi
           if [[ -n "${SYNC_TOKEN}" ]]; then
             pr_token="${SYNC_TOKEN}"
           else

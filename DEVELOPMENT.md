@@ -134,11 +134,13 @@ passmcp's, on a `feat/vX.Y.Z` branch:
    [docs/publishing.md](docs/publishing.md).
 
 Steps 1 and 2 are what `.github/workflows/sync.yml` does on passmcp's
-release dispatch: it opens a pull request that makes both edits. With a
+release dispatch. When the `feat/vX.Y.Z` release branch exists, it commits
+both edits onto it through the API and opens nothing, so the release stays
+one pull request; otherwise it opens a pull request against `main`. A pull
+request it opens with `GITHUB_TOKEN` triggers no workflows: with a
 `SYNC_TOKEN` secret, a fine-grained token with `pull-requests: write` on
-this repository, that pull request's checks start on their own; without
-it, close and reopen the pull request to start them, because one opened
-with `GITHUB_TOKEN` triggers no workflows.
+this repository, its checks start on their own, and without one, close and
+reopen it to start them.
 
 ## Conventions
 

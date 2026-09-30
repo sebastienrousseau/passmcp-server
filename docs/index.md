@@ -13,6 +13,10 @@ passmcp, the MCP server diagnostic, as read-only MCP tools over stdio.
 | [COMPARISON.md](COMPARISON.md) | passmcp-server beside the other ways to run passmcp |
 | [BENCHMARKS.md](BENCHMARKS.md) | What the server adds to a run, and how it was measured |
 | [publishing.md](publishing.md) | Publishing the MCP Registry listing after a release |
+| [Release 0.0.4](releases/v0.0.4.md) | The highlights of the 0.0.4 release |
+| [Release 0.0.3](releases/v0.0.3.md) | The highlights of the 0.0.3 release |
+| [Release 0.0.2](releases/v0.0.2.md) | The highlights of the 0.0.2 release |
+| [Release 0.0.1](releases/v0.0.1.md) | The highlights of the first release |
 | [../server.json](https://github.com/sebastienrousseau/passmcp-server/blob/main/server.json) | The registry listing itself |
 
 What each check means, and how to fix it, is passmcp's manual:

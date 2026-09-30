@@ -120,18 +120,37 @@ passmcp's, on a `feat/vX.Y.Z` branch:
    lines and ecosystem sentence, in `server.json` (both `version` and the
    image tag) and in `CITATION.cff` (`version` and `date-released`), and
    move `go.mod` to passmcp-reporting's `vX.Y.Z`, which is tagged first.
+   Write `docs/releases/vX.Y.Z.md` with its `## Highlights ⭐️`, the only
+   hand-written part of the release page.
 2. Point the `Dockerfile`'s `FROM` at passmcp X.Y.Z's image digest
    (`docker buildx imagetools inspect ghcr.io/sebastienrousseau/passmcp:X.Y.Z`)
    and set `PASSMCP_VERSION=X.Y.Z`.
 3. `make lockstep` and `scripts/verify-release-versions.sh vX.Y.Z`
    (`make versions` runs it for the newest CHANGELOG release).
-4. `goreleaser check`, and optionally the Release workflow's dry run.
+4. `goreleaser check`, and optionally the Release workflow's dry run,
+   which also prints the release page.
 5. Push a signed annotated tag `vX.Y.Z` with the message
    `passmcp-server vX.Y.Z`. The Release workflow builds the binaries and the
-   image, signs them, and attests the checksums.
+   image, signs them, attests the checksums, and publishes the release
+   page.
 6. Read the tag, the release page and the image's labels back before
    calling it done, then publish the registry listing:
    [docs/publishing.md](docs/publishing.md).
+
+The release page is composed, never edited by hand. The Release
+workflow's last step runs `scripts/releasepage`, which titles the page
+`passmcp-server X.Y.Z` and writes the highlights from `docs/releases/vX.Y.Z.md`,
+GitHub's generated `## What's Changed` (and `## New Contributors` when
+there are any), the SHA-256 of every attached asset under `## Checksums`,
+and the `**Full Changelog**` link, then reads the page back and fails
+unless GitHub shows what it composed. The dry run prints the same page for
+its snapshot artefacts. To see the page a tag has, or would have, without
+publishing anything (`gh` needs a token with contents access for GitHub's
+generated notes):
+
+```sh
+go run ./scripts/releasepage -name passmcp-server -tag vX.Y.Z
+```
 
 Steps 1 and 2 are what `.github/workflows/sync.yml` does on passmcp's
 release dispatch. When the `feat/vX.Y.Z` release branch exists, it commits

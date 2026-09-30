@@ -35,6 +35,11 @@ results are the 0.0.1 ones.
 
 ### Fixed
 
+- **The sync workflow keeps a release to one pull request.** On
+  passmcp's release dispatch it opened its own pull request into `main`,
+  beside the release branch's. When `feat/vX.Y.Z` exists it now commits
+  the pins onto that branch instead, and opens a pull request only when
+  there is no release branch.
 - **The registry listing's publishing guide names the right login.**
   `com.sebastienrousseau/passmcp-server` is a domain namespace, which the
   registry grants on DNS proof for `sebastienrousseau.com`; the guide said

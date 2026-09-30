@@ -105,7 +105,15 @@ the badge document: its colour bands, and every malformed profile.
 
 ## Generated artefacts
 
-None are committed. Release archives, checksums and the image are built by
+One is committed: the README demo, `.github/demo.gif`, because GitHub renders
+it from the tree. Regenerate it with `make demo` whenever what it shows
+changes; it installs passmcp and its example server at the lockstep release,
+builds passmcp-server into `build/demo`, and records `.github/demo.tape` with
+[VHS](https://github.com/charmbracelet/vhs) (`vhs`, `ttyd` and `ffmpeg` on
+`PATH`). Leave 90 seconds between renders: the example server a render
+starts stops itself then, and holds its port until it does.
+
+Nothing else is. Release archives, checksums and the image are built by
 goreleaser into `dist/`; `make build`, `make smoke`, `make completions`,
 `make coverage-json` and `make image` write to `build/`. Both are ignored.
 

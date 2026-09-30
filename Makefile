@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 .PHONY: all build test test-race coverage coverage-json vet lint format spdx-check smoke digest \
-        readme-check server-json image lockstep family completions help name-guard versions
+        readme-check server-json image lockstep family completions help name-guard versions demo
 
 # Every gate CI runs that needs no network, in the order the cheap ones fail
 # first.
@@ -71,6 +71,18 @@ smoke:
 	@for t in passmcp_check passmcp_verify_attestation passmcp_version; do grep -q "\"name\":\"$$t\"" build/smoke.out || { echo "smoke: $$t missing from tools/list"; exit 1; }; done
 	@echo "smoke: initialize and tools/list answered with all three tools"
 
+# The README demo (.github/demo.gif), rendered by VHS from .github/demo.tape:
+# passmcp-server's tools answering `passmcp call` over stdio. passmcp and its
+# example server are installed at the lockstep release, like the dogfood job;
+# everything goes to build/demo, which is git-ignored. Needs vhs, ttyd and
+# ffmpeg.
+demo:
+	@mkdir -p build/demo
+	ver="$$(grep -Eo '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | head -1 | tr -d '#[] ')"; \
+	  GOBIN="$(CURDIR)/build/demo" go install "satellion.com/passmcp/cmd/passmcp@v$${ver}" "satellion.com/passmcp/examples/servers@v$${ver}"
+	CGO_ENABLED=0 go build -trimpath -o build/demo/passmcp-server ./cmd/passmcp-server
+	PATH="$(CURDIR)/build/demo:$$PATH" vhs .github/demo.tape
+
 # server.json against the registry schema it names. Needs the network and
 # check-jsonschema (through uvx, or pipx on a CI runner).
 CHECK_JSONSCHEMA ?= $(shell command -v uvx >/dev/null 2>&1 && echo 'uvx --from check-jsonschema check-jsonschema' || echo 'pipx run check-jsonschema')
@@ -108,7 +120,7 @@ versions:
 
 help:
 	@printf '%s\n' "targets: all build test test-race coverage coverage-json vet lint format spdx-check smoke" \
-	  "         completions readme-check server-json image digest lockstep family versions name-guard" \
+	  "         completions readme-check server-json image digest lockstep family versions name-guard demo" \
 	  "GNUmakefile: install uninstall install-smoke (PREFIX, DESTDIR)"
 
 # A retired product name may not appear anywhere in the tree

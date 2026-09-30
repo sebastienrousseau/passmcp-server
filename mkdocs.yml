@@ -4,7 +4,7 @@
 site_name: passmcp-server
 site_description: An MCP server exposing passmcp's diagnostics as read-only tools.
 site_url: https://sebastienrousseau.com/passmcp-server/
-copyright: '<a href="https://sebastienrousseau.com/" rel="author">&copy; 2026 Sebastien Rousseau</a>'
+copyright: '&copy; 2026 <a href="https://sebastienrousseau.com/" rel="author">Sebastien Rousseau</a>'
 repo_url: https://github.com/sebastienrousseau/passmcp-server
 repo_name: sebastienrousseau/passmcp-server
 edit_uri: edit/main/docs/

@@ -13,7 +13,9 @@ release — the container image is built on passmcp's image for the same
 version — so its version is passmcp's latest release, exactly, and a release
 here with nothing in it is the version rule working.
 
-## [0.0.3]
+## [Unreleased]
+
+## [0.0.3] — 2026-09-30
 
 The family's third release. The three tools, their arguments and their
 results are the 0.0.1 ones.
@@ -26,6 +28,10 @@ results are the 0.0.1 ones.
   endpoint the default allowlist refuses; `FuzzAllowlist` checks that an
   accepted endpoint is always a credential-free http or https URL named
   by loopback or by an allowlist entry.
+
+### Changed
+
+- **In lockstep with passmcp 0.0.3.** The image builds on `ghcr.io/sebastienrousseau/passmcp@sha256:88668e403cb4fe2e63032e9d69550acb59a449701d1f2ab1b52d436e96806dad`, the multi-arch image passmcp's release published for 0.0.3, and every install line and the registry listing name the release. Written by the sync workflow for passmcp's release; passmcp's own changelog says what changed in the diagnostic.
 
 ### Fixed
 
@@ -99,6 +105,7 @@ The first release.
   attestation about one, from inside the editor. The tools are read-only,
   the targets allowlisted, and no credential is ever sent.
 
-[0.0.3]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.2...HEAD
+[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.3...HEAD
+[0.0.3]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.3
 [0.0.2]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.2
 [0.0.1]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1

@@ -15,6 +15,21 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
+## [0.0.4] — 2026-09-30
+
+### Added
+
+- **A README demo**, rendered from `.github/demo.tape` by `make demo`: an
+  agent's view of the server over stdio: its version tool, then a real
+  passmcp check of an example MCP server through it.
+
+### Changed
+
+- **In lockstep with passmcp 0.0.4.** The image builds on `ghcr.io/sebastienrousseau/passmcp@sha256:a619e709cddc568394e7bf3b700f9ca44d925c658087c882d5a077ad65cdfdc7`, the multi-arch image passmcp's release published for 0.0.4, and every install line and the registry listing name the release. Written by the sync workflow for passmcp's release; passmcp's own changelog says what changed in the diagnostic.
+- **Release pages are published in the family layout** by the release
+  workflow itself (Highlights, What's Changed, Checksums, Full Changelog),
+  so no page is rewritten by hand after a release.
+
 ## [0.0.3] — 2026-09-30
 
 The family's third release. The three tools, their arguments and their
@@ -110,7 +125,8 @@ The first release.
   attestation about one, from inside the editor. The tools are read-only,
   the targets allowlisted, and no credential is ever sent.
 
-[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.3...HEAD
+[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.4...HEAD
+[0.0.4]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.4
 [0.0.3]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.3
 [0.0.2]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.2
 [0.0.1]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.1

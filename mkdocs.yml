@@ -4,6 +4,7 @@
 site_name: passmcp-server
 site_description: An MCP server exposing passmcp's diagnostics as read-only tools.
 site_url: https://sebastienrousseau.com/passmcp-server/
+copyright: '&copy; 2026 <a href="https://sebastienrousseau.com/" rel="author">Sebastien Rousseau</a>'
 repo_url: https://github.com/sebastienrousseau/passmcp-server
 repo_name: sebastienrousseau/passmcp-server
 edit_uri: edit/main/docs/
@@ -56,3 +57,8 @@ nav:
       - adr/0002-loopback-only-allowlist.md
       - adr/0003-no-operator-configuration-credentials-or-mutations.md
       - adr/0004-version-in-lockstep-with-passmcp.md
+  - Releases:
+      - 0.0.4: releases/v0.0.4.md
+      - 0.0.3: releases/v0.0.3.md
+      - 0.0.2: releases/v0.0.2.md
+      - 0.0.1: releases/v0.0.1.md

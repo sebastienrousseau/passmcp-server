@@ -3,7 +3,7 @@
   "name": "com.sebastienrousseau/passmcp-server",
   "title": "passmcp",
   "description": "Evaluate an MCP server with passmcp and verify its attestations, from inside the agent. Read-only.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "url": "https://github.com/sebastienrousseau/passmcp-server",
     "source": "github"
@@ -12,7 +12,7 @@
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/sebastienrousseau/passmcp-server:0.0.4",
+      "identifier": "ghcr.io/sebastienrousseau/passmcp-server:0.0.5",
       "runtimeHint": "docker",
       "transport": {
         "type": "stdio"

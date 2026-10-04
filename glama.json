@@ -1,0 +1,40 @@
+{
+  "$schema": "https://glama.ai/api/mcp/v1/schemas/glama.json",
+  "maintainers": [
+    "sebastienrousseau"
+  ],
+  "title": "passmcp-server",
+  "display_name": "passmcp-server MCP",
+  "description": "Evaluate an MCP server with passmcp and verify its attestations, from inside the agent. Read-only.",
+  "version": "0.0.5",
+  "repository": "https://github.com/sebastienrousseau/passmcp-server",
+  "homepage": "https://github.com/sebastienrousseau/passmcp-server",
+  "license": "GPL-3.0-only",
+  "language": "Go",
+  "runtime": "docker",
+  "categories": [
+    "developer-tools",
+    "security"
+  ],
+  "tags": [
+    "mcp",
+    "security",
+    "evaluation",
+    "attestation",
+    "go"
+  ],
+  "mcpServers": {
+    "passmcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "ghcr.io/sebastienrousseau/passmcp-server:0.0.5"
+      ]
+    }
+  },
+  "installation": {
+    "docker": "docker run --rm -i ghcr.io/sebastienrousseau/passmcp-server:0.0.5"
+  }
+}

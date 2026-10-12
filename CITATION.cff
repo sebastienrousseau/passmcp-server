@@ -23,5 +23,5 @@ keywords:
   - diagnostics
   - golang
 license: GPL-3.0-only
-version: 0.0.5
-date-released: "2026-10-01"
+version: 0.0.6
+date-released: "2026-10-12"

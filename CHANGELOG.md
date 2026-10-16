@@ -15,8 +15,11 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
+## [0.0.7] — 2026-10-16
+
 ### Changed
 
+- **In lockstep with passmcp 0.0.7.** The image builds on `ghcr.io/sebastienrousseau/passmcp@sha256:ae285e9b8f55c560615b7afad94f37e3c43f9689128c0270fb3b3048be476065`, the multi-arch image passmcp's release published for 0.0.7, and every install line and the registry listing name the release. Written by the sync workflow for passmcp's release; passmcp's own changelog says what changed in the diagnostic.
 - **Build with Go 1.26.9.** The `go` directive moves from 1.26.8, whose
   standard library carries thirteen advisories `govulncheck` reports
   against this module: twelve in `net/http`, its HTTP/2 server,
@@ -158,7 +161,8 @@ The first release.
   attestation about one, from inside the editor. The tools are read-only,
   the targets allowlisted, and no credential is ever sent.
 
-[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.6...HEAD
+[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.7...HEAD
+[0.0.7]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.7
 [0.0.6]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.6
 [0.0.5]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.5
 [0.0.4]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.4

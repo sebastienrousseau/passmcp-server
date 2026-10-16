@@ -15,6 +15,27 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
+### Changed
+
+- **Build with Go 1.26.9.** The `go` directive moves from 1.26.8, whose
+  standard library carries thirteen advisories `govulncheck` reports
+  against this module: twelve in `net/http`, its HTTP/2 server,
+  `net/textproto`, `crypto/tls` and `html/template`, and one in `os` on
+  Windows (GO-2026-6599 to GO-2026-6617). None is reachable from this
+  server's code, but CI and the release workflow build with the `go.mod`
+  toolchain, so release binaries carried that standard library. All are
+  fixed in 1.26.9, as in passmcp.
+- **GitHub Actions updated**: `actions/upload-artifact` 7.0.2 and
+  `github/codeql-action` 4.38.3, pinned by digest
+  ([#12](https://github.com/sebastienrousseau/passmcp-server/pull/12)).
+
+### Fixed
+
+- **The 0.0.5 release notes no longer claim a licence change.**
+  `docs/releases/v0.0.5.md` said 0.0.5 moved to a dual Apache-2.0 and
+  MIT licence; passmcp-server is, and was, GPL-3.0-only. The published
+  release page never carried the claim.
+
 ## [0.0.6] — 2026-10-12
 
 ### Changed

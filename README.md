@@ -18,7 +18,7 @@
   <a href="https://pkg.go.dev/satellion.com/passmcp-server"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&labelColor=555555&logo=go&logoColor=white" alt="Docs" /></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/passmcp-server"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/passmcp-server?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--only-blue.svg?style=for-the-badge" alt="License: GPL-3.0-only" /></a>
-  <a href="https://github.com/sebastienrousseau/passmcp-server/blob/main/DEVELOPMENT.md#requirements"><img src="https://img.shields.io/badge/go-1.26.8%2B-93450a.svg?style=for-the-badge&logo=go" alt="Go 1.26.8+" /></a>
+  <a href="https://github.com/sebastienrousseau/passmcp-server/blob/main/DEVELOPMENT.md#requirements"><img src="https://img.shields.io/badge/go-1.26.9%2B-93450a.svg?style=for-the-badge&logo=go" alt="Go 1.26.9+" /></a>
 </p>
 
 <p align="center">

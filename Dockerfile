@@ -16,8 +16,8 @@
 # scripts/verify-release-versions.sh refuses a release where it and the
 # tag disagree; move it and the digest together. To resolve the digest:
 #   docker buildx imagetools inspect ghcr.io/sebastienrousseau/passmcp:<version>
-ARG PASSMCP_VERSION=0.0.6
-FROM ghcr.io/sebastienrousseau/passmcp@sha256:b5cf306d1c8a4f33f9e59a027d01855188f6a178ec25559d057e21aec7672ca5
+ARG PASSMCP_VERSION=0.0.7
+FROM ghcr.io/sebastienrousseau/passmcp@sha256:ae285e9b8f55c560615b7afad94f37e3c43f9689128c0270fb3b3048be476065
 
 ARG PASSMCP_VERSION
 ARG TARGETPLATFORM

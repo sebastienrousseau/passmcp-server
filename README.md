@@ -18,7 +18,7 @@
   <a href="https://pkg.go.dev/satellion.com/passmcp-server"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?style=for-the-badge&labelColor=555555&logo=go&logoColor=white" alt="Docs" /></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/passmcp-server"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/passmcp-server?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--only-blue.svg?style=for-the-badge" alt="License: GPL-3.0-only" /></a>
-  <a href="https://github.com/sebastienrousseau/passmcp-server/blob/main/DEVELOPMENT.md#requirements"><img src="https://img.shields.io/badge/go-1.26.8%2B-93450a.svg?style=for-the-badge&logo=go" alt="Go 1.26.8+" /></a>
+  <a href="https://github.com/sebastienrousseau/passmcp-server/blob/main/DEVELOPMENT.md#requirements"><img src="https://img.shields.io/badge/go-1.26.9%2B-93450a.svg?style=for-the-badge&logo=go" alt="Go 1.26.9+" /></a>
 </p>
 
 <p align="center">
@@ -68,8 +68,8 @@ image carries it. `passmcp_verify_attestation` needs nothing but passmcp-server.
 ### As a Go program
 
 ```sh
-go install satellion.com/passmcp-server/cmd/passmcp-server@v0.0.6
-go install satellion.com/passmcp/cmd/passmcp@v0.0.6
+go install satellion.com/passmcp-server/cmd/passmcp-server@v0.0.7
+go install satellion.com/passmcp/cmd/passmcp@v0.0.7
 ```
 
 Release binaries for Linux, macOS and Windows on amd64 and arm64 are on
@@ -93,7 +93,7 @@ on every push.
 ### As a container image
 
 ```sh
-docker pull ghcr.io/sebastienrousseau/passmcp-server:0.0.6
+docker pull ghcr.io/sebastienrousseau/passmcp-server:0.0.7
 ```
 
 The image is passmcp's own release image with passmcp-server added: distroless,
@@ -124,7 +124,7 @@ With the container image instead:
   "mcpServers": {
     "passmcp": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "ghcr.io/sebastienrousseau/passmcp-server:0.0.6"]
+      "args": ["run", "-i", "--rm", "ghcr.io/sebastienrousseau/passmcp-server:0.0.7"]
     }
   }
 }
@@ -158,8 +158,8 @@ patch release like everything else pre-1.0, and the changelog says so.
 ## Quick Start
 
 ```sh
-go install satellion.com/passmcp-server/cmd/passmcp-server@v0.0.6
-go install satellion.com/passmcp/cmd/passmcp@v0.0.6
+go install satellion.com/passmcp-server/cmd/passmcp-server@v0.0.7
+go install satellion.com/passmcp/cmd/passmcp@v0.0.7
 claude mcp add passmcp -- passmcp-server
 ```
 
@@ -178,7 +178,7 @@ named with `--allow` first.
 
 ## The passmcp-server ecosystem
 
-Every component is released at **0.0.6** and moves in lockstep: one version across the family, released together ([docs/ecosystem.md](https://github.com/sebastienrousseau/passmcp/blob/main/docs/ecosystem.md)).
+Every component is released at **0.0.7** and moves in lockstep: one version across the family, released together ([docs/ecosystem.md](https://github.com/sebastienrousseau/passmcp/blob/main/docs/ecosystem.md)).
 
 | Component | Purpose | Use case |
 | :--- | :--- | :--- |

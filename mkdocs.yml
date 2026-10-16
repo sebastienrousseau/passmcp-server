@@ -58,6 +58,9 @@ nav:
       - adr/0003-no-operator-configuration-credentials-or-mutations.md
       - adr/0004-version-in-lockstep-with-passmcp.md
   - Releases:
+      - 0.0.7: releases/v0.0.7.md
+      - 0.0.6: releases/v0.0.6.md
+      - 0.0.5: releases/v0.0.5.md
       - 0.0.4: releases/v0.0.4.md
       - 0.0.3: releases/v0.0.3.md
       - 0.0.2: releases/v0.0.2.md

@@ -192,10 +192,13 @@ jobs:
           fi
           # One API commit per changed file: each is signed by GitHub, which
           # is what the signed-commit rule asks for and a runner cannot do.
+          # The subject stays within the 50-character limit whatever the
+          # path; the file goes in the body.
           for f in $(git diff --name-only); do
             sha=$(gh api "repos/${REPO}/contents/${f}?ref=${branch}" --jq .sha)
+            msg=$(printf 'chore(sync): pin passmcp %s\n\nMoves %s to passmcp %s.' "${VERSION}" "${f}" "${VERSION}")
             gh api --method PUT "repos/${REPO}/contents/${f}" \
-              -f message="chore: pin the passmcp ${VERSION} image in ${f}" \
+              -f message="${msg}" \
               -f content="$(base64 -w0 "${f}")" -f sha="${sha}" -f branch="${branch}" >/dev/null
           done
           if [[ "${DIRECT}" == true ]]; then

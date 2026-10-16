@@ -15,7 +15,7 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
-## [0.0.7] — 2026-10-16
+## [0.0.7] — 2026-10-17
 
 ### Changed
 

@@ -15,6 +15,12 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
+## [0.0.8] — 2026-10-18
+
+### Changed
+
+- **In lockstep with passmcp 0.0.8.** The image builds on `ghcr.io/sebastienrousseau/passmcp@sha256:756eddf26e50db9a925052947778cbc6cb25b4151a5bc6f644af55c04a91ac95`, the multi-arch image passmcp's release published for 0.0.8, and every install line and the registry listing name the release. Written by the sync workflow for passmcp's release; passmcp's own changelog says what changed in the diagnostic.
+
 ## [0.0.7] — 2026-10-17
 
 ### Changed
@@ -161,7 +167,8 @@ The first release.
   attestation about one, from inside the editor. The tools are read-only,
   the targets allowlisted, and no credential is ever sent.
 
-[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.7...HEAD
+[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.8...HEAD
+[0.0.8]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.8
 [0.0.7]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.7
 [0.0.6]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.6
 [0.0.5]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.5

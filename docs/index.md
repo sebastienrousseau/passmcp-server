@@ -13,6 +13,9 @@ passmcp, the MCP server diagnostic, as read-only MCP tools over stdio.
 | [COMPARISON.md](COMPARISON.md) | passmcp-server beside the other ways to run passmcp |
 | [BENCHMARKS.md](BENCHMARKS.md) | What the server adds to a run, and how it was measured |
 | [publishing.md](publishing.md) | Publishing the MCP Registry listing after a release |
+| [Release 0.0.7](releases/v0.0.7.md) | The highlights of the 0.0.7 release |
+| [Release 0.0.6](releases/v0.0.6.md) | The highlights of the 0.0.6 release |
+| [Release 0.0.5](releases/v0.0.5.md) | The highlights of the 0.0.5 release |
 | [Release 0.0.4](releases/v0.0.4.md) | The highlights of the 0.0.4 release |
 | [Release 0.0.3](releases/v0.0.3.md) | The highlights of the 0.0.3 release |
 | [Release 0.0.2](releases/v0.0.2.md) | The highlights of the 0.0.2 release |

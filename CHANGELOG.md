@@ -20,6 +20,17 @@ here with nothing in it is the version rule working.
 ### Changed
 
 - **In lockstep with passmcp 0.0.8.** The image builds on `ghcr.io/sebastienrousseau/passmcp@sha256:756eddf26e50db9a925052947778cbc6cb25b4151a5bc6f644af55c04a91ac95`, the multi-arch image passmcp's release published for 0.0.8, and every install line and the registry listing name the release. Written by the sync workflow for passmcp's release; passmcp's own changelog says what changed in the diagnostic.
+- **Attestations are verified by passmcp-reporting 0.0.8.** `go.mod`
+  requires the family's 0.0.8 release. Its verifier packages are
+  unchanged from 0.0.7, so `passmcp_verify_attestation` answers exactly
+  as before. Nothing else in the server changed: this release is the
+  version rule working.
+
+### Fixed
+
+- **The manual's index lists every release page.** `docs/index.md`
+  stopped at 0.0.4; it now lists 0.0.5 to 0.0.8, as the manual's
+  Releases navigation does.
 
 ## [0.0.7] — 2026-10-17
 

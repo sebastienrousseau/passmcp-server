@@ -15,6 +15,13 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
+### Security
+
+- The manual's build tree (`docs/requirements.txt`) floors
+  `certifi >= 2026.10.19` (PYSEC-2026-4320, GHSA-6q48-6c7w-9gw2; it pinned
+  2026.7.22). Only certifi moves; the header records pip-tools 7's
+  `--no-emit-index-url` spelling of the compile command.
+
 ## [0.0.8] — 2026-10-18
 
 ### Changed

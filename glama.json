@@ -6,7 +6,7 @@
   "title": "passmcp-server",
   "display_name": "passmcp-server MCP",
   "description": "Evaluate an MCP server with passmcp and verify its attestations, from inside the agent. Read-only.",
-  "version": "0.0.5",
+  "version": "0.0.9",
   "repository": "https://github.com/sebastienrousseau/passmcp-server",
   "homepage": "https://github.com/sebastienrousseau/passmcp-server",
   "license": "GPL-3.0-only",
@@ -30,11 +30,11 @@
         "run",
         "--rm",
         "-i",
-        "ghcr.io/sebastienrousseau/passmcp-server:0.0.5"
+        "ghcr.io/sebastienrousseau/passmcp-server:0.0.9"
       ]
     }
   },
   "installation": {
-    "docker": "docker run --rm -i ghcr.io/sebastienrousseau/passmcp-server:0.0.5"
+    "docker": "docker run --rm -i ghcr.io/sebastienrousseau/passmcp-server:0.0.9"
   }
 }

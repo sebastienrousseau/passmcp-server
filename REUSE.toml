@@ -13,7 +13,7 @@ SPDX-PackageDownloadLocation = "https://github.com/sebastienrousseau/passmcp-ser
 # Go module metadata, the registry listing, repository configuration and
 # the dev container definition: files whose format takes no SPDX header.
 [[annotations]]
-path = ["go.mod", "go.sum", "server.json", ".gitignore", ".github/CODEOWNERS", ".devcontainer/devcontainer.json"]
+path = ["go.mod", "go.sum", "server.json", "glama.json", ".gitignore", ".github/CODEOWNERS", ".devcontainer/devcontainer.json"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Sebastien Rousseau <sebastian.rousseau@gmail.com>"
 SPDX-License-Identifier = "GPL-3.0-only"

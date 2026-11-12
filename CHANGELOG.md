@@ -15,6 +15,27 @@ here with nothing in it is the version rule working.
 
 ## [Unreleased]
 
+## [0.0.9] — 2026-11-12
+
+### Changed
+
+- **In lockstep with passmcp 0.0.9.** The image builds on `ghcr.io/sebastienrousseau/passmcp@sha256:2f3be37521a05e7106ffa9568ebc9f8a9dd1103caa81d094d202d37dd294e2e2`, the multi-arch image passmcp's release published for 0.0.9, and every install line and the registry listing name the release. Written by the sync workflow for passmcp's release; passmcp's own changelog says what changed in the diagnostic.
+- **Attestations are verified by passmcp-reporting 0.0.9.** `go.mod`
+  requires the family's 0.0.9 release. Its verifier packages are
+  unchanged from 0.0.8, so `passmcp_verify_attestation` answers exactly
+  as before.
+- **GitHub Actions updated**: `github/codeql-action` 4.39.3,
+  `docker/login-action` 4.8.0, `sigstore/cosign-installer` 4.1.3,
+  `goreleaser/goreleaser-action` 7.3.0, `DavidAnson/markdownlint-cli2-action`
+  25.0.0, `actions/setup-python` 7.1.0, and `ossf/scorecard-action`
+  2.5.0, pinned by digest.
+
+### Fixed
+
+- **`glama.json` version and REUSE annotation**: `glama.json` moves from
+  `0.0.5` to `0.0.9` and is annotated in `REUSE.toml` so `reuse lint`
+  covers every file in the tree.
+
 ### Security
 
 - The manual's build tree (`docs/requirements.txt`) floors
@@ -185,7 +206,8 @@ The first release.
   attestation about one, from inside the editor. The tools are read-only,
   the targets allowlisted, and no credential is ever sent.
 
-[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.8...HEAD
+[Unreleased]: https://github.com/sebastienrousseau/passmcp-server/compare/v0.0.9...HEAD
+[0.0.9]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.9
 [0.0.8]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.8
 [0.0.7]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.7
 [0.0.6]: https://github.com/sebastienrousseau/passmcp-server/releases/tag/v0.0.6
